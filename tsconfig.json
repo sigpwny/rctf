@@ -11,7 +11,10 @@
     "inlineSourceMap": true,
     "inlineSources": true,
     "outDir": "dist/server",
-    "baseUrl": "."
+    "baseUrl": ".",
+  },
+  "rules": {
+    "no-unused-vars": "off"
   },
   "include": [
     "server/**/*"

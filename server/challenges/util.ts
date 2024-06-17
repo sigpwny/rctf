@@ -13,7 +13,8 @@ const ChallengeDefaults: Challenge = {
     min: 0,
     max: 0
   },
-  flag: ''
+  flag: '',
+  type: 'default'
 }
 
 export const applyChallengeDefaults = (chall: Challenge): Challenge => {

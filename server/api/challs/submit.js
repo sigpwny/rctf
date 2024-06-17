@@ -74,21 +74,49 @@ export default {
     const bufSubmittedFlag = Buffer.from(submittedFlag)
     const bufCorrectFlag = Buffer.from(challenge.flag)
 
-    if (bufSubmittedFlag.length !== bufCorrectFlag.length) {
-      return responses.badFlag
-    }
+    const challengeType = challenge.type
+    let submittedHash, submittedLength = null
 
-    if (!crypto.timingSafeEqual(bufSubmittedFlag, bufCorrectFlag)) {
-      return responses.badFlag
+    if (challengeType === 'ranked') {
+      const parts = submittedFlag.split('.')
+      if (parts.length !== 2) {
+        return responses.badFlagRanked
+      }
+      [submittedHash, submittedLength] = parts
+
+      // The user will receive SHA256(FLAG || answerLength) || '.' || answerLength
+      
+      const correctHash = crypto.createHash('sha256').update(bufCorrectFlag).update(submittedLength.toString()).digest('hex')
+      if (!crypto.timingSafeEqual(submittedHash, correctHash)) {
+        return responses.badFlagRanked
+      }
+
+    } else {
+
+      if (bufSubmittedFlag.length !== bufCorrectFlag.length) {
+        return responses.badFlag
+      }
+  
+      if (!crypto.timingSafeEqual(bufSubmittedFlag, bufCorrectFlag)) {
+        return responses.badFlag
+      }
     }
 
     try {
-      await db.solves.newSolve({ id: uuidv4(), challengeid: challengeid, userid: uuid, createdat: new Date() })
-      return responses.goodFlag
+      const metadata = (challengeType === 'ranked') ? { length: submittedLength } : {}
+      // If we are a ranked challenge and we have a better solve, we want to delete the old solve
+      if (challengeType === 'ranked') {
+        const oldSolve = db.solves.getSolveByUserIdAndChallId({ userid: uuid, challengeid })
+        if (oldSolve && oldSolve.metadata.length > submittedLength) {
+          await db.solves.removeSolvesByUserIdAndChallId({ userid: uuid, challengeid })
+        }
+      }
+      await db.solves.newSolve({ id: uuidv4(), challengeid: challengeid, userid: uuid, createdat: new Date(), metadata })
+      return (challengeType === 'ranked') ? responses.goodFlagRanked : responses.goodFlag
     } catch (e) {
       if (e.constraint === 'uq') {
         // not a unique submission, so the user already solved
-        return responses.badAlreadySolvedChallenge
+        return (challengeType === 'ranked') ? responses.badAlreadySolvedChallengeRanked : responses.badAlreadySolvedChallenge
       }
       if (e.constraint === 'uuid_fkey') {
         // the user referenced by the solve isnt in the users table

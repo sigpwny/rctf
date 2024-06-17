@@ -1,3 +1,5 @@
+export type ChallengeType = 'default' | 'ranked'
+
 export interface Points {
   min: number;
   max: number;
@@ -17,6 +19,7 @@ export interface CleanedChallenge {
   files: File[];
   points: Points;
   sortWeight?: number;
+  type: ChallengeType;
 }
 
 export interface Challenge {
@@ -30,4 +33,5 @@ export interface Challenge {
   flag: string;
   tiebreakEligible: boolean;
   sortWeight?: number;
+  type: ChallengeType;
 }

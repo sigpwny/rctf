@@ -45,3 +45,7 @@ export const newSolve = ({ id, userid, challengeid, createdat, metadata }: Solve
 export const removeSolvesByUserId = async ({ userid }: Pick<Solve, 'userid'>): Promise<void> => {
   await db.query('DELETE FROM solves WHERE userid = $1', [userid])
 }
+
+export const removeSolvesByUserIdAndChallId = async ({ userid, challengeid }: Pick<Solve, 'userid' | 'challengeid'>): Promise<void> => {
+  await db.query('DELETE FROM solves WHERE userid = $1 AND challengeid = $2', [userid, challengeid])
+}

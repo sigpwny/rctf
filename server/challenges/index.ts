@@ -14,7 +14,7 @@ let challengesMap = new Map<string, Challenge>()
 let cleanedChallengesMap = new Map<string, CleanedChallenge>()
 
 const cleanChallenge = (chall: Challenge): CleanedChallenge => {
-  const { files, description, author, points, id, name, category, sortWeight } = chall
+  const { files, description, author, points, id, name, category, sortWeight, type } = chall
 
   return {
     files,
@@ -24,7 +24,8 @@ const cleanChallenge = (chall: Challenge): CleanedChallenge => {
     id,
     name,
     category,
-    sortWeight
+    sortWeight,
+    type
   }
 }
 

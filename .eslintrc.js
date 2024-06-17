@@ -3,23 +3,17 @@ module.exports = {
     es6: true
   },
   extends: [
-    'standard',
-    'eslint:recommended',
-    "plugin:@typescript-eslint/recommended"
+    'standard'
   ],
-  "parser": "@typescript-eslint/parser",
-  "parserOptions": { "project": ["./tsconfig.json"] },
-  // parserOptions: {
-  //   ecmaFeatures: {
-  //   },
-  //   ecmaVersion: 2018,
-  //   sourceType: 'module'
-  // },
+  parserOptions: {
+    ecmaFeatures: {
+    },
+    ecmaVersion: 2018,
+    sourceType: 'module'
+  },
   plugins: [
-    '@typescript-eslint'
   ],
   rules: {
-    '@typescript-eslint/no-unused-vars': 'off',
     'no-multiple-empty-lines': ['error', {
       max: 1,
       maxEOF: 0,

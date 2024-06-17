@@ -11,3 +11,11 @@ export const getScore = (rl: number, rh: number, maxSolves: number, solves: numb
   const f = (x: number): number => rl + (rh - rl) * b(x / s)
   return Math.round(Math.max(f(solves), f(s)))
 }
+
+
+// Linear interpolation of score between [minScore and maxScore], where maxScore gets you more points.
+export const getRankedScore = (rl: number, rh: number, minScore: number, maxScore: number, score: number) => {
+  // Thanks copilot
+  const f = (x: number): number => rl + (rh - rl) * (x - minScore) / (maxScore - minScore)
+  return Math.round(Math.max(f(score), f(minScore)))
+}

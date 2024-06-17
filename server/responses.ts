@@ -127,6 +127,10 @@ export const responseList = {
     status: 400,
     message: 'The flag was incorrect.'
   },
+  badFlagFormatRanked: {
+    status: 400,
+    message: 'The flag format was incorrect - e.g. "blabla.100"'
+  },
   badFlagRanked: {
     status: 400,
     message: 'The flag was incorrect.'
@@ -141,7 +145,7 @@ export const responseList = {
   },
   badAlreadySolvedChallengeRanked: {
     status: 409,
-    message: 'A better flag was already submitted'
+    message: 'A flag was already submitted with an equal or higher score'
   },
   goodToken: {
     status: 200,

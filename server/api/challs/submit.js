@@ -5,6 +5,7 @@ import { responses } from '../../responses'
 import config from '../../config/server'
 import * as timeouts from '../../cache/timeouts'
 import { v4 as uuidv4 } from 'uuid'
+import { challengeToRow } from '../../challenges/util'
 
 export default {
   method: 'POST',
@@ -48,7 +49,8 @@ export default {
 
     req.log.info({
       chall: challengeid,
-      flag: submittedFlag
+      flag: submittedFlag,
+      type: challenge.type
     }, 'flag submission attempt')
 
     if (!challenge) {
@@ -75,19 +77,18 @@ export default {
     const bufCorrectFlag = Buffer.from(challenge.flag)
 
     const challengeType = challenge.type
-    let submittedHash, submittedLength = null
+    let submittedHash, submittedScore = null
 
     if (challengeType === 'ranked') {
       const parts = submittedFlag.split('.')
       if (parts.length !== 2) {
-        return responses.badFlagRanked
+        return responses.badFlagFormatRanked
       }
-      [submittedHash, submittedLength] = parts
-
+      [submittedHash, submittedScore] = parts
       // The user will receive SHA256(FLAG || answerLength) || '.' || answerLength
       
-      const correctHash = crypto.createHash('sha256').update(bufCorrectFlag).update(submittedLength.toString()).digest('hex')
-      if (!crypto.timingSafeEqual(submittedHash, correctHash)) {
+      const correctHash = crypto.createHash('sha256').update(bufCorrectFlag).update(submittedScore.toString()).digest('hex')
+      if (submittedHash != correctHash) {
         return responses.badFlagRanked
       }
 
@@ -103,16 +104,36 @@ export default {
     }
 
     try {
-      const metadata = (challengeType === 'ranked') ? { length: submittedLength } : {}
+      const metadata = (challengeType === 'ranked') ? { score: submittedScore } : {}
       // If we are a ranked challenge and we have a better solve, we want to delete the old solve
       if (challengeType === 'ranked') {
-        const oldSolve = db.solves.getSolveByUserIdAndChallId({ userid: uuid, challengeid })
-        if (oldSolve && oldSolve.metadata.length > submittedLength) {
+        const oldSolve = await db.solves.getSolveByUserIdAndChallId({ userid: uuid, challengeid })
+        // If the new score is higher, delete the old solve.
+        if (oldSolve && oldSolve.metadata.score < submittedScore) {
           await db.solves.removeSolvesByUserIdAndChallId({ userid: uuid, challengeid })
         }
       }
+
+      // If this is a new best performance, update the challenge
+      const maxScore = (challenge.rankedMetadata || {}).maxScore || -1
+      if (maxScore === -1 || submittedScore > maxScore) {
+        challenge.rankedMetadata = { maxScore: submittedScore, ...(challenge.rankedMetadata || {}) }
+        req.log.info(challenge, 'updating challenge to this')
+        await db.challenges.upsertChallenge(challengeToRow(challenge))
+      }
+      
+      // If this is a new worst performance, update the challenge
+      const minScore = (challenge.rankedMetadata || {}).minScore || -1
+      if (minScore === -1 || submittedScore < minScore) {
+        challenge.rankedMetadata = { minScore: submittedScore, ...(challenge.rankedMetadata || {}) }
+        req.log.info(challenge, 'updating challenge to this')
+        await db.challenges.upsertChallenge(challengeToRow(challenge))
+      }
+
       await db.solves.newSolve({ id: uuidv4(), challengeid: challengeid, userid: uuid, createdat: new Date(), metadata })
       return (challengeType === 'ranked') ? responses.goodFlagRanked : responses.goodFlag
+
+    
     } catch (e) {
       if (e.constraint === 'uq') {
         // not a unique submission, so the user already solved

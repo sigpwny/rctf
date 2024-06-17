@@ -1,4 +1,4 @@
-export type ChallengeType = 'default' | 'ranked'
+export type ChallengeType = 'dynamic' | 'ranked'
 
 export interface Points {
   min: number;
@@ -22,6 +22,11 @@ export interface CleanedChallenge {
   type: ChallengeType;
 }
 
+export interface RankedMetadata {
+  maxScore: number; /* The best user score */
+  minScore: number; /* The minimum user score */
+}
+
 export interface Challenge {
   id: string;
   name: string;
@@ -34,4 +39,5 @@ export interface Challenge {
   tiebreakEligible: boolean;
   sortWeight?: number;
   type: ChallengeType;
+  rankedMetadata?: RankedMetadata;
 }

@@ -4,7 +4,7 @@ import type { User } from './users'
 import type { ExtractQueryType } from './util'
 
 export interface SolveMetadata {
-  solveLength?: number;
+  score?: number;
 }
 
 export interface Solve {

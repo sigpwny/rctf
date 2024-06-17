@@ -2,6 +2,7 @@ import path from 'path'
 import fastify from 'fastify'
 import fastifyStatic from 'fastify-static'
 import helmet from 'fastify-helmet'
+import cors from 'fastify-cors'
 import hyperid from 'hyperid'
 import config from './config/server'
 import { serveIndex, getRealIp } from './util'
@@ -47,6 +48,10 @@ app.register(helmet, {
       imgSrc: ['*', 'data:']
     }
   }
+})
+
+app.register(cors, {
+  origin: ["https://2024.uiuc.tf", "https://uiuctf-2024-rctf-frontend.pages.dev"]
 })
 
 uploadProviderInit(app)

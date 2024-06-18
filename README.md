@@ -5,6 +5,71 @@
 
 rCTF is redpwnCTF's CTF platform. It is developed and (used to be) maintained by the [redpwn](https://redpwn.net) CTF team.
 
+## Installation
+
+install.
+
+```
+curl https://get.rctf.redpwn.net > install.sh && chmod +x install.sh
+./install.sh
+```
+
+build the image.
+
+```
+docker build -t us-central1-docker.pkg.dev/dotted-forest-314903/rctf/rctf .
+```
+
+update docker compose.
+
+```
+# docker-compose.yml
+version: '2.2'
+services:
+  rctf:
+    image: us-central1-docker.pkg.dev/dotted-forest-314903/rctf/rctf # redpwn/rctf:${RCTF_GIT_REF}
+    restart: always
+    ports:
+      - '127.0.0.1:8080:80'
+    networks:
+      - rctf
+    env_file:
+      - .env
+    environment:
+      - PORT=80
+    volumes:
+      - ./conf.d:/app/conf.d
+    depends_on:
+      - redis
+      - postgres
+  redis:
+    image: redis:6.0.6
+    restart: always
+    command: ["redis-server", "--requirepass", "${RCTF_REDIS_PASSWORD}"]
+    networks:
+      - rctf
+    volumes:
+      - ./data/rctf-redis:/data
+  postgres:
+    image: postgres:12.3
+    restart: always
+    ports:
+      - '127.0.0.1:5432:5432'
+    environment:
+      - POSTGRES_PASSWORD=${RCTF_DATABASE_PASSWORD}
+      - POSTGRES_USER=rctf
+      - POSTGRES_DB=rctf
+    networks:
+      - rctf
+    volumes:
+      - ./data/rctf-postgres:/var/lib/postgresql/data
+
+networks:
+  rctf: {}
+```
+
+
+
 ## Getting Started
 
 To get started with rCTF, visit the docs at [rctf.redpwn.net](https://rctf.redpwn.net/installation/)

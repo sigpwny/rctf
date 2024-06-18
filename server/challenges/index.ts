@@ -14,8 +14,12 @@ let challengesMap = new Map<string, Challenge>()
 let cleanedChallengesMap = new Map<string, CleanedChallenge>()
 
 const cleanChallenge = (chall: Challenge): CleanedChallenge => {
-  const { files, description, author, points, id, name, category, sortWeight } = chall
+  const { files, description, author, points, id, name, category, sortWeight, type, rankedMetadata } = chall
 
+  if (rankedMetadata) {
+    if (rankedMetadata.maxScore !== undefined) rankedMetadata.maxScore = +rankedMetadata.maxScore
+    if (rankedMetadata.minScore !== undefined) rankedMetadata.minScore = +rankedMetadata.minScore
+  }
   return {
     files,
     description,
@@ -24,7 +28,9 @@ const cleanChallenge = (chall: Challenge): CleanedChallenge => {
     id,
     name,
     category,
-    sortWeight
+    sortWeight,
+    type,
+    rankedMetadata
   }
 }
 

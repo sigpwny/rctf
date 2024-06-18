@@ -1,5 +1,5 @@
 import { workerData, parentPort } from 'worker_threads'
-import { getScore } from '../util/scores'
+import { getRankedScore, getScore } from '../util/scores'
 import { calcSamples } from './samples'
 import config from '../config/server'
 
@@ -27,11 +27,13 @@ let lastIndex = 0
 const calculateScores = (sample) => {
   const challengeValues = new Map()
   const userScores = []
+  const challengeRankedMetadata = new Map()
 
   for (; lastIndex < solves.length; lastIndex++) {
     const challId = solves[lastIndex].challengeid
     const userId = solves[lastIndex].userid
     const createdAt = solves[lastIndex].createdat
+    const solveScore = solves[lastIndex].metadata.score || 0
 
     if (createdAt > sample) {
       break
@@ -49,9 +51,9 @@ const calculateScores = (sample) => {
     }
     // Store which challenges each user solved for later
     if (!userSolves.has(userId)) {
-      userSolves.set(userId, [challId])
+      userSolves.set(userId, [{ challId, solveScore }])
     } else {
-      userSolves.get(userId).push(challId)
+      userSolves.get(userId).push({ challId, solveScore })
     }
   }
 
@@ -60,6 +62,12 @@ const calculateScores = (sample) => {
     const amt = solveAmount.get(allChallenges[i].id)
     if (amt > maxSolveAmount) {
       maxSolveAmount = amt
+    }
+  }
+
+  for (let i = 0; i < allChallenges.length; i++) {
+    if (allChallenges[i].type === 'ranked') {
+      challengeRankedMetadata.set(allChallenges[i].id, { ... allChallenges[i].rankedMetadata, min: allChallenges[i].points.min, max: allChallenges[i].points.max })
     }
   }
 
@@ -81,8 +89,24 @@ const calculateScores = (sample) => {
     if (lastSolve === undefined) continue // If the user has not solved any challenges, do not add to leaderboard
     const solvedChalls = userSolves.get(user.id)
     for (let j = 0; j < solvedChalls.length; j++) {
-      // Add the score for the specific solve loaded from the challengeValues array using ids
-      const value = challengeValues.get(solvedChalls[j])
+      const { challId: solvedChallId, solveScore } = solvedChalls[j]
+      const rankedMetadata = challengeRankedMetadata.get(solvedChallId)
+      let value = undefined
+      if (rankedMetadata !== undefined) {
+        // If the challenge is ranked, calculate this on a per-solve basis
+        value = getRankedScore(
+          rankedMetadata.min,
+          rankedMetadata.max,
+          rankedMetadata.minScore,
+          rankedMetadata.maxScore,
+          solveScore
+    )
+      } else {
+        // Add the score for the specific solve loaded from the challengeValues array using ids
+
+        value = challengeValues.get(solvedChallId)
+      }
+
       if (value !== undefined) {
         currScore += value
       }

@@ -1,7 +1,9 @@
 version: '2.2'
 services:
   rctf:
-    image: redpwn/rctf:${RCTF_GIT_REF}
+    # image: redpwn/rctf:${RCTF_GIT_REF}
+    build:
+      dockerfile: Dockerfile
     restart: always
     ports:
       - '127.0.0.1:8080:80'

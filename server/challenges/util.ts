@@ -1,5 +1,6 @@
 import { Challenge } from './types'
 import { deepCopy } from '../util'
+import { DatabaseChallenge } from '../database/challenges'
 
 const ChallengeDefaults: Challenge = {
   id: '',
@@ -13,7 +14,8 @@ const ChallengeDefaults: Challenge = {
     min: 0,
     max: 0
   },
-  flag: ''
+  flag: '',
+  type: 'dynamic'
 }
 
 export const applyChallengeDefaults = (chall: Challenge): Challenge => {
@@ -22,5 +24,14 @@ export const applyChallengeDefaults = (chall: Challenge): Challenge => {
   return {
     ...copy,
     ...chall
+  }
+}
+
+export const challengeToRow = (challIn: Challenge): DatabaseChallenge => {
+  const { id, ...chall } = deepCopy(challIn)
+
+  return {
+    id,
+    data: chall
   }
 }

@@ -119,7 +119,19 @@ export const responseList = {
     status: 200,
     message: 'The flag is correct.'
   },
+  goodFlagRanked: {
+    status: 200,
+    message: 'The flag is correct.'
+  },
   badFlag: {
+    status: 400,
+    message: 'The flag was incorrect.'
+  },
+  badFlagFormatRanked: {
+    status: 400,
+    message: 'The flag format was incorrect - e.g. "blabla.100"'
+  },
+  badFlagRanked: {
     status: 400,
     message: 'The flag was incorrect.'
   },
@@ -130,6 +142,10 @@ export const responseList = {
   badAlreadySolvedChallenge: {
     status: 409,
     message: 'The flag was already submitted'
+  },
+  badAlreadySolvedChallengeRanked: {
+    status: 409,
+    message: 'A flag was already submitted with an equal or higher score'
   },
   goodToken: {
     status: 200,

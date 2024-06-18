@@ -42,5 +42,5 @@ export const submitFlag = async (id, flag) => {
     flag
   })
 
-  return handleResponse({ resp, valid: ['goodFlag'] })
+  return handleResponse({ resp, valid: ['goodFlag', 'goodFlagRanked'] })
 }

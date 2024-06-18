@@ -39,6 +39,7 @@ export type ServerConfig = {
   instanceType: string;
   tokenKey: string;
   origin: string;
+  originFrontend?: string;
 
   // TODO: enforce `trust` is false when `cloudflare` is true
   proxy: {

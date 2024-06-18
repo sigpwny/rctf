@@ -50,9 +50,11 @@ app.register(helmet, {
   }
 })
 
-app.register(cors, {
-  origin: "https://uiuctf-2024-rctf-frontend.pages.dev"
-})
+if (config.originFrontend) {
+  app.register(cors, {
+    origin: config.originFrontend
+  })
+}
 
 uploadProviderInit(app)
 

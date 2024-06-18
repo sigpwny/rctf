@@ -30,7 +30,7 @@ if (emailConfig) {
     const emailView = {
       ctf_name: config.ctfName,
       logo_url: config.logoUrl,
-      origin: config.origin,
+      origin: config.originFrontend ?? config.origin,
       token: encodeURIComponent(token),
       register: kind === 'register',
       recover: kind === 'recover',

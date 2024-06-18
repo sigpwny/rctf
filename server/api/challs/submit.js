@@ -117,16 +117,14 @@ export default {
       // If this is a new best performance, update the challenge
       const maxScore = (challenge.rankedMetadata || {}).maxScore || -1
       if (maxScore === -1 || submittedScore > maxScore) {
-        challenge.rankedMetadata = { maxScore: submittedScore, ...(challenge.rankedMetadata || {}) }
-        req.log.info(challenge, 'updating challenge to this')
+        challenge.rankedMetadata = { ...(challenge.rankedMetadata || {}), maxScore: submittedScore }
         await db.challenges.upsertChallenge(challengeToRow(challenge))
       }
       
       // If this is a new worst performance, update the challenge
       const minScore = (challenge.rankedMetadata || {}).minScore || -1
       if (minScore === -1 || submittedScore < minScore) {
-        challenge.rankedMetadata = { minScore: submittedScore, ...(challenge.rankedMetadata || {}) }
-        req.log.info(challenge, 'updating challenge to this')
+        challenge.rankedMetadata = { ...(challenge.rankedMetadata || {}), minScore: submittedScore }
         await db.challenges.upsertChallenge(challengeToRow(challenge))
       }
 

@@ -50,9 +50,13 @@ app.register(helmet, {
   }
 })
 
-if (config.originFrontend) {
+if (config.originFrontend !== null) {
   app.register(cors, {
     origin: config.originFrontend
+  })
+} else {
+  app.register(cors, {
+    origin: false
   })
 }
 

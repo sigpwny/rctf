@@ -20,6 +20,7 @@ export interface CleanedChallenge {
   points: Points;
   sortWeight?: number;
   type: ChallengeType;
+  rankedMetadata?: RankedMetadata;
 }
 
 export interface RankedMetadata {

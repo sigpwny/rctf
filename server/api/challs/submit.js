@@ -87,7 +87,7 @@ export default {
       [submittedHash, submittedScore] = parts
       // The user will receive SHA256(FLAG || answerLength) || '.' || answerLength
       
-      const correctHash = crypto.createHash('sha256').update(bufCorrectFlag).update(submittedScore.toString()).digest('hex')
+      const correctHash = crypto.createHash('sha256').update(bufCorrectFlag).update(submittedScore).digest('hex')
       if (submittedHash != correctHash) {
         return responses.badFlagRanked
       }
@@ -104,27 +104,27 @@ export default {
     }
 
     try {
-      const metadata = (challengeType === 'ranked') ? { score: submittedScore } : {}
+      const metadata = (challengeType === 'ranked') ? { score: +submittedScore } : {}
       // If we are a ranked challenge and we have a better solve, we want to delete the old solve
       if (challengeType === 'ranked') {
         const oldSolve = await db.solves.getSolveByUserIdAndChallId({ userid: uuid, challengeid })
         // If the new score is higher, delete the old solve.
-        if (oldSolve && oldSolve.metadata.score < submittedScore) {
+        if (oldSolve && (+oldSolve.metadata.score) < +submittedScore) {
           await db.solves.removeSolvesByUserIdAndChallId({ userid: uuid, challengeid })
         }
       }
 
       // If this is a new best performance, update the challenge
       const maxScore = (challenge.rankedMetadata || {}).maxScore || -1
-      if (maxScore === -1 || submittedScore > maxScore) {
-        challenge.rankedMetadata = { ...(challenge.rankedMetadata || {}), maxScore: submittedScore }
+      if (maxScore === -1 || +submittedScore > +maxScore) {
+        challenge.rankedMetadata = { ...(challenge.rankedMetadata || {}), maxScore: +submittedScore }
         await db.challenges.upsertChallenge(challengeToRow(challenge))
       }
       
       // If this is a new worst performance, update the challenge
       const minScore = (challenge.rankedMetadata || {}).minScore || -1
-      if (minScore === -1 || submittedScore < minScore) {
-        challenge.rankedMetadata = { ...(challenge.rankedMetadata || {}), minScore: submittedScore }
+      if (minScore === -1 || +submittedScore < +minScore) {
+        challenge.rankedMetadata = { ...(challenge.rankedMetadata || {}), minScore: +submittedScore }
         await db.challenges.upsertChallenge(challengeToRow(challenge))
       }
 

@@ -112,21 +112,21 @@ export default {
         if (oldSolve && (+oldSolve.metadata.score) < +submittedScore) {
           await db.solves.removeSolvesByUserIdAndChallId({ userid: uuid, challengeid })
         }
+        // If this is a new best performance, update the challenge
+        const maxScore = (challenge.rankedMetadata || {}).maxScore || -1
+        if (maxScore === -1 || +submittedScore > +maxScore) {
+          challenge.rankedMetadata = { ...(challenge.rankedMetadata || {}), maxScore: +submittedScore }
+          await db.challenges.upsertChallenge(challengeToRow(challenge))
+        }
+        
+        // If this is a new worst performance, update the challenge
+        const minScore = (challenge.rankedMetadata || {}).minScore || -1
+        if (minScore === -1 || +submittedScore < +minScore) {
+          challenge.rankedMetadata = { ...(challenge.rankedMetadata || {}), minScore: +submittedScore }
+          await db.challenges.upsertChallenge(challengeToRow(challenge))
+        }
       }
 
-      // If this is a new best performance, update the challenge
-      const maxScore = (challenge.rankedMetadata || {}).maxScore || -1
-      if (maxScore === -1 || +submittedScore > +maxScore) {
-        challenge.rankedMetadata = { ...(challenge.rankedMetadata || {}), maxScore: +submittedScore }
-        await db.challenges.upsertChallenge(challengeToRow(challenge))
-      }
-      
-      // If this is a new worst performance, update the challenge
-      const minScore = (challenge.rankedMetadata || {}).minScore || -1
-      if (minScore === -1 || +submittedScore < +minScore) {
-        challenge.rankedMetadata = { ...(challenge.rankedMetadata || {}), minScore: +submittedScore }
-        await db.challenges.upsertChallenge(challengeToRow(challenge))
-      }
 
       await db.solves.newSolve({ id: uuidv4(), challengeid: challengeid, userid: uuid, createdat: new Date(), metadata })
       return (challengeType === 'ranked') ? responses.goodFlagRanked : responses.goodFlag

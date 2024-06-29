@@ -74,12 +74,16 @@ const calculateScores = (sample) => {
 
   for (let i = 0; i < allChallenges.length; i++) {
     const challenge = allChallenges[i]
-    challengeValues.set(challenge.id, getScore(
-      challenge.points.min,
-      challenge.points.max,
-      maxSolveAmount,
-      solveAmount.get(challenge.id)
-    ))
+    if (challenge.type === 'ranked') {
+      challengeValues.set(challenge.id, -1)
+    } else {
+      challengeValues.set(challenge.id, getScore(
+        challenge.points.min,
+        challenge.points.max,
+        maxSolveAmount,
+        solveAmount.get(challenge.id)
+      ))
+    }
   }
 
   const rankedSolvesForLogging = []
@@ -97,7 +101,7 @@ const calculateScores = (sample) => {
       if (rankedMetadata !== undefined) {
         // If the challenge is ranked, calculate this on a per-solve basis
         value = getRankedScore(
-          rankedMetadata.min,
+          100,
           rankedMetadata.max,
           rankedMetadata.minScore,
           rankedMetadata.maxScore,
@@ -108,7 +112,7 @@ const calculateScores = (sample) => {
           challengeId: solvedChallId,
           score: solveScore,
           value,
-          min: rankedMetadata.min,
+          min: 100,
           max: rankedMetadata.max,
           minScore: rankedMetadata.minScore,
           maxScore: rankedMetadata.maxScore

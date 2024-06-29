@@ -26,7 +26,7 @@ class DatabaseProvider extends EventEmitter implements Provider {
         }
       })
 
-      console.log({ databaseUpdateChallenges: this.challenges })
+      console.dir({ databaseUpdateChallenges: this.challenges }, { depth: null })
 
       this.emit('update', this.challenges)
     } catch (e) {

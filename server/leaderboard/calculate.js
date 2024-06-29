@@ -12,7 +12,7 @@ const {
   }
 } = workerData
 
-console.log({ allChallenges })
+console.dir({ allChallenges }, { depth: null })
 const solveAmount = new Map()
 const challengeTiebreakEligibles = new Map()
 for (let i = 0; i < allChallenges.length; i++) {
@@ -133,8 +133,8 @@ const calculateScores = (sample) => {
     ])
   }
 
-  console.log({ rankedSolvesForLogging })
-  console.log({ challengeRankedMetadata })
+  console.dir({ rankedSolvesForLogging }, { depth: null })
+  console.dir({ challengeRankedMetadata }, { depth: null })
 
   return {
     challengeValues,

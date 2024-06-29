@@ -17,7 +17,7 @@ const fetchData = async () => {
     graphUpdate,
     allChallenges: getAllChallenges()
   }
-  console.log({ workerData })
+  console.dir({ workerData }, { depth: null })
   return workerData
 }
 
@@ -34,7 +34,7 @@ const runUpdate = async () => {
     }
   })
   worker.once('message', async (data) => {
-    console.log({ leaderboardData: data })
+    console.dir({ leaderboardData: data }, { depth: null })
     await cache.leaderboard.setLeaderboard(data)
     await cache.leaderboard.setGraph({ leaderboards: data.graphLeaderboards })
     updating = false

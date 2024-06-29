@@ -12,6 +12,7 @@ const {
   }
 } = workerData
 
+console.dir({ allChallenges }, { depth: null })
 const solveAmount = new Map()
 const challengeTiebreakEligibles = new Map()
 for (let i = 0; i < allChallenges.length; i++) {
@@ -81,6 +82,7 @@ const calculateScores = (sample) => {
     ))
   }
 
+  const rankedSolvesForLogging = []
   for (let i = 0; i < users.length; i++) {
     const user = users[i]
     let currScore = 0
@@ -100,7 +102,17 @@ const calculateScores = (sample) => {
           rankedMetadata.minScore,
           rankedMetadata.maxScore,
           solveScore
-    )
+        )
+        rankedSolvesForLogging.push({
+          userId: user.id,
+          challengeId: solvedChallId,
+          score: solveScore,
+          value,
+          min: rankedMetadata.min,
+          max: rankedMetadata.max,
+          minScore: rankedMetadata.minScore,
+          maxScore: rankedMetadata.maxScore
+        })
       } else {
         // Add the score for the specific solve loaded from the challengeValues array using ids
 
@@ -120,6 +132,9 @@ const calculateScores = (sample) => {
       lastSolve
     ])
   }
+
+  console.dir({ rankedSolvesForLogging }, { depth: null })
+  console.dir({ challengeRankedMetadata }, { depth: null })
 
   return {
     challengeValues,
@@ -158,6 +173,8 @@ samples.forEach((sample) => {
 
 const { userScores, challengeValues } = calculateScores(leaderboardUpdate)
 const sortedUsers = userScores.sort(userCompare).map((user) => user.slice(0, 4))
+
+console.log({ sortedUsers })
 
 parentPort.postMessage({
   leaderboard: sortedUsers,

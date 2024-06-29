@@ -11,12 +11,14 @@ const fetchData = async () => {
     database.users.getAllUsers(),
     cache.leaderboard.getGraphUpdate()
   ])
-  return {
+  const workerData = {
     solves,
     users,
     graphUpdate,
     allChallenges: getAllChallenges()
   }
+  console.dir({ workerData }, { depth: null })
+  return workerData
 }
 
 let updating = false
@@ -32,6 +34,7 @@ const runUpdate = async () => {
     }
   })
   worker.once('message', async (data) => {
+    console.dir({ leaderboardData: data }, { depth: null })
     await cache.leaderboard.setLeaderboard(data)
     await cache.leaderboard.setGraph({ leaderboards: data.graphLeaderboards })
     updating = false

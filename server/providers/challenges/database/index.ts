@@ -26,6 +26,8 @@ class DatabaseProvider extends EventEmitter implements Provider {
         }
       })
 
+      console.dir({ databaseUpdateChallenges: this.challenges }, { depth: null })
+
       this.emit('update', this.challenges)
     } catch (e) {
       // TODO: wrap error?

@@ -131,6 +131,7 @@ export const setLeaderboard = async ({ challengeValues, solveAmount, leaderboard
   challengeValues.forEach((value, key) => {
     challengeInfo.push(key, `${value},${solveAmount.get(key)}`)
   })
+  console.log({ challengeValues, solveAmount, leaderboard, leaderboardUpdate })
   await redisEvalsha(
     await setLeaderboardScript,
     keys.length,

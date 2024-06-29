@@ -50,7 +50,8 @@ export default {
     req.log.info({
       chall: challengeid,
       flag: submittedFlag,
-      type: challenge.type
+      type: challenge.type,
+      challenge: challenge
     }, 'flag submission attempt')
 
     if (!challenge) {

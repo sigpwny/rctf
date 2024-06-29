@@ -35,6 +35,7 @@ const cleanChallenge = (chall: Challenge): CleanedChallenge => {
 }
 
 const onUpdate = (newChallenges: Challenge[]): void => {
+  console.log({ newChallenges })
   challenges = newChallenges
   challengesMap = new Map(newChallenges.map(c => [c.id, c]))
   cleanedChallenges = challenges.map(cleanChallenge)

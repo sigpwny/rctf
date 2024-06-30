@@ -61,7 +61,7 @@ const calculateScores = (sample) => {
   let maxSolveAmount = 0
   for (let i = 0; i < allChallenges.length; i++) {
     const amt = solveAmount.get(allChallenges[i].id)
-    if (amt > maxSolveAmount) {
+    if (amt > maxSolveAmount && allChallenges[i].category !== 'osint') {
       maxSolveAmount = amt
     }
   }
